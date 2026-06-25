@@ -1,42 +1,28 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from flask import Flask, request
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 TOKEN = "8752669113:AAFRiRJUhKn9KkEB3tPT_h7VCmCFkcls9LU"
 
-# دیتای تستی (بعدا حرفه‌ای می‌کنیم)
-secret_data = {
-    1: {
-        "target": 907489298,  # اینجا user_id خودتو بذار
-        "text": "این یک پیام محرمانه است 🔐"
-    }
-}
+app = Flask(__name__)
 
+# ساخت اپ تلگرام
+application = ApplicationBuilder().token(TOKEN).build()
 
+# هندلر تست
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("👁 مشاهده پیام", callback_data="view_1")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("ربات فعاله ✅")
 
-    await update.message.reply_text("روی دکمه بزن:", reply_markup=reply_markup)
+application.add_handler(CommandHandler("start", start))
 
+# مسیر webhook
+@app.route(f"/{TOKEN}", methods=["POST"])
+async def webhook():
+    data = request.get_json(force=True)
+    update = Update.de_json(data, application.bot)
+    await application.process_update(update)
+    return "ok"
 
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    user_id = query.from_user.id
-    data = secret_data[1]
-
-    if user_id == data["target"]:
-        await query.answer(data["text"], show_alert=True)
-    else:
-        await query.answer("❌ دسترسی نداری", show_alert=True)
-
-app = ApplicationBuilder().token(TOKEN).build()
-
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(button))
-
-app.run_polling()
-print(update.message.from_user.id)
+# اجرای سرور
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
