@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = "8752669113:AAHoSYck-eXZLV5QaOiWqva2QOYEols2Gpo"
+TOKEN = "8752669113:AAFRiRJUhKn9KkEB3tPT_h7VCmCFkcls9LU"
 
 # دیتای تستی (بعدا حرفه‌ای می‌کنیم)
 secret_data = {
